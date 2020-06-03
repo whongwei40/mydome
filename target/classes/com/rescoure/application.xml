@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <mvc:annotation-driven/>
+    <mvc:resources mapping="/js/**" location="/js/"/>
+    <mvc:resources mapping="/htmls/**" location="/htmls/"/>
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.bjpowernode.myinterceptor.myInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!--组件扫描器-->
+    <context:component-scan base-package="com.bjpowernode.Service"/>
+    <context:component-scan base-package="com.bjpowernode.controller"/>
+
+    <bean id="mysource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close" init-method="init">
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    <bean id="SessionFactotyBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="mysource"/>
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="SessionFactotyBean"/>
+        <property name="basePackage" value="com.bjpowernode.Dao"/>
+    </bean>
+
+</beans>
